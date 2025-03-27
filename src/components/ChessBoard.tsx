@@ -47,7 +47,7 @@ export default function ChessBoard({ gameState, onMove, isPlayerTurn, flipped = 
       setSelectedPosition(position);
       
       const validMoves = getValidMoves(board, position);
-      const newBoard = [...board.map(row => [...row.map(s => ({ ...s }))]);
+      const newBoard = [...board.map(row => [...row.map(s => ({ ...s }))])];
       
       // Highlight the selected square
       newBoard[position.y][position.x].isSelected = true;
