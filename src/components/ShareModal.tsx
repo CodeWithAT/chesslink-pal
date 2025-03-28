@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Copy, QrCode } from "lucide-react";
+import { Copy } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -23,6 +24,16 @@ export default function ShareModal({
   shareUrl,
   onCopyLink,
 }: ShareModalProps) {
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  
+  useEffect(() => {
+    // Generate QR code using Google Charts API
+    if (shareUrl) {
+      const encodedUrl = encodeURIComponent(shareUrl);
+      setQrCodeUrl(`https://chart.googleapis.com/chart?cht=qr&chl=${encodedUrl}&chs=250x250&choe=UTF-8&chld=L|2`);
+    }
+  }, [shareUrl]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -47,9 +58,13 @@ export default function ShareModal({
         </div>
         
         <div className="flex flex-col items-center justify-center mt-4 border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground mb-2">QR Code</div>
-          <div className="w-32 h-32 bg-gray-100 rounded flex items-center justify-center">
-            <QrCode className="h-24 w-24 text-gray-300" />
+          <div className="text-sm text-muted-foreground mb-2">Scan QR Code to Join</div>
+          <div className="w-48 h-48 bg-white rounded flex items-center justify-center">
+            {qrCodeUrl ? (
+              <img src={qrCodeUrl} alt="QR Code for game link" className="w-full h-full" />
+            ) : (
+              <div className="animate-pulse w-full h-full bg-gray-200"></div>
+            )}
           </div>
         </div>
       </DialogContent>

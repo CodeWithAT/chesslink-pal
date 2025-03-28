@@ -13,6 +13,18 @@ export function createGameSession(options: GameOptions): { gameId: string; gameS
   const gameId = generateGameId();
   const gameState = initializeGame(options);
   
+  // For online games, set status to waiting
+  if (options.type === 'online') {
+    gameState.status = 'waiting';
+  }
+  
+  // Initialize times for timed games
+  if (options.time) {
+    const timeInMs = options.time.minutes * 60 * 1000;
+    gameState.whiteTime = timeInMs;
+    gameState.blackTime = timeInMs;
+  }
+  
   // Save the game to local storage
   saveGameToStorage(gameId, gameState);
   
@@ -29,6 +41,7 @@ export function joinGameSession(gameId: string, playerColor: PieceColor): GameSt
   const updatedState: GameState = {
     ...gameState,
     status: 'active',
+    joinedAt: new Date().toISOString(),
   };
   
   // Save the updated game state
@@ -53,18 +66,24 @@ export function syncGameState(gameId: string, gameState: GameState): void {
   // For now, this just saves to local storage
   saveGameToStorage(gameId, gameState);
   
-  // Simulated delayed response for online opponent
-  // This is ONLY for demo purposes. A real app would use proper networking.
-  if (gameState.options.type === 'online' && gameState.currentTurn !== gameState.options.playerColor) {
-    setTimeout(() => {
-      console.log('Simulating opponent move sync');
-      // In a real app, this would be handled by receiving updates from the server
-    }, 1000);
-  }
+  // Add timestamp to help with polling updates
+  const updatedState = {
+    ...gameState,
+    lastUpdated: new Date().toISOString()
+  };
+  
+  saveGameToStorage(gameId, updatedState);
 }
 
 // Generate a shareable link for the game
 export function getShareableLink(gameId: string): string {
+  // Use the current window location to create an absolute URL
+  // This ensures we get the correct domain, protocol, and port
   const baseUrl = window.location.origin;
   return `${baseUrl}/game/${gameId}`;
+}
+
+// Check if a game exists
+export function gameExists(gameId: string): boolean {
+  return loadGameFromStorage(gameId) !== null;
 }
