@@ -1,4 +1,3 @@
-
 // Chess piece types
 export type PieceType = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
 export type PieceColor = 'white' | 'black';
@@ -64,6 +63,8 @@ export type GameState = {
   options: GameOptions;
   whiteTime?: number; // Remaining time in milliseconds
   blackTime?: number;
+  joinedAt?: string; // ISO string timestamp when opponent joined
+  lastUpdated?: string; // ISO string timestamp of last update
 };
 
 // Initialize a new chess board
@@ -112,6 +113,8 @@ export function initializeGame(options: GameOptions): GameState {
     options,
     whiteTime: options.time ? options.time.minutes * 60 * 1000 : defaultTimeControl.minutes * 60 * 1000,
     blackTime: options.time ? options.time.minutes * 60 * 1000 : defaultTimeControl.minutes * 60 * 1000,
+    joinedAt: undefined,
+    lastUpdated: undefined,
   };
 }
 
